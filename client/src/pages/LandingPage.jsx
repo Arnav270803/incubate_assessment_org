@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AppContext } from '../Context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import Login from '../auth/Login';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -16,10 +17,6 @@ const HoverBorderGradient = ({
 }) => {
   const gradientStyle = {
     background: `conic-gradient(from 0deg, transparent, #e2e8f0, #cbd5e1, #94a3b8, #64748b, #475569, #334155, transparent)`
-  };
-
-  const glowStyle = {
-    background: `conic-gradient(from 0deg, transparent, #f1f5f9, #e2e8f0, #cbd5e1, #94a3b8, transparent)`
   };
 
   return (
@@ -39,8 +36,10 @@ const HoverBorderGradient = ({
         }}
       />
       <div
-        className="relative z-10 px-8 py-3 font-medium backdrop-blur-3xl"
-        className={className}
+        className={cn(
+          'relative z-10 px-8 py-3 font-medium backdrop-blur-3xl',
+          className
+        )}
       >
         {children}
       </div>
@@ -49,8 +48,9 @@ const HoverBorderGradient = ({
 };
 
 const LandingPage = () => {
-  const { setShowLogin = () => {}, user = null } = useContext(AppContext);
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
@@ -72,6 +72,8 @@ const LandingPage = () => {
           {user ? 'Welcome Back!' : 'Get Started'}
         </HoverBorderGradient>
       </motion.div>
+
+      {showLogin && <Login onClose={() => setShowLogin(false)} />}
     </div>
   );
 };

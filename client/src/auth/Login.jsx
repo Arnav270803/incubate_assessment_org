@@ -1,15 +1,15 @@
-import React, { useContext, useState } from 'react';
-import { AppContext } from '../Context/AppContext';
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
-  const { setShowLogin = () => {} } = useContext(AppContext);
+const Login = ({ onClose }) => {
+  const { login } = useAuth(); // login will be added via TDD later
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    // Phase 0: no auth logic yet
+    // Stub for now — real logic comes next phase
     console.log('Login submitted (stub)', { email, password });
   };
 
@@ -50,7 +50,7 @@ const Login = () => {
 
         <button
           type="button"
-          onClick={() => setShowLogin(false)}
+          onClick={onClose}
           className="w-full mt-4 text-sm text-gray-500"
         >
           Close
