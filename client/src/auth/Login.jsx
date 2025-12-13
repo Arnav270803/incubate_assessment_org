@@ -1,69 +1,139 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { Candy, Mail, Lock, UserPlus, LogIn } from 'lucide-react';
 
-const Login = ({ onClose }) => {
-  const { login } = useAuth();
-
+const Login = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
 
-  const onSubmitHandler = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      login(email, password);
-      onClose();
-    } catch (err) {
-      setError(err.message);
+      const result = isLogin 
+        ? await login(email, password)
+        : await register(email, password);
+
+      if (result.success) {
+        toast.success(isLogin ? 'Login successful!' : 'Registration successful!');
+        navigate('/dashboard');
+      } else {
+        toast.error(result.message || 'Operation failed');
+      }
+    } catch (error) {
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <form
-        onSubmit={onSubmitHandler}
-        className="bg-white rounded-xl p-8 w-full max-w-md"
-      >
-        <h2 className="text-xl font-semibold mb-6 text-center">Login</h2>
-
-        {error && (
-          <p className="mb-4 text-red-500 text-sm text-center">
-            {error}
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4">
+            <Candy className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Sweet Shop
+          </h1>
+          <p className="text-gray-600">
+            {isLogin ? 'Welcome back!' : 'Create your account'}
           </p>
-        )}
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded"
-        />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                placeholder="you@example.com"
+                disabled={loading}
+              />
+            </div>
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-6 px-4 py-2 border rounded"
-        />
+          {/* Password Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                placeholder="••••••••"
+                disabled={loading}
+              />
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-teal-600 text-white py-2 rounded"
-        >
-          Continue
-        </button>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+            ) : (
+              <>
+                {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+                {isLogin ? 'Login' : 'Register'}
+              </>
+            )}
+          </button>
+        </form>
 
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-full mt-4 text-sm text-gray-500"
-        >
-          Close
-        </button>
-      </form>
+        {/* Toggle Login/Register */}
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-purple-600 hover:text-purple-700 font-medium transition"
+            disabled={loading}
+          >
+            {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
+          </button>
+        </div>
+
+        {/* Admin Note */}
+        <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+          <p className="text-xs text-gray-600 text-center">
+            <span className="font-semibold">Note:</span> First registered user becomes admin automatically
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
