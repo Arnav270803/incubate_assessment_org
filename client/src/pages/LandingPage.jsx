@@ -1,51 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Login from '../auth/Login';
-
-const cn = (...classes) => classes.filter(Boolean).join(' ');
-
-const HoverBorderGradient = ({
-  children,
-  containerClassName,
-  className,
-  as: Tag = 'div',
-  duration = 1,
-  clockwise = true,
-  ...props
-}) => {
-  const gradientStyle = {
-    background: `conic-gradient(from 0deg, transparent, #e2e8f0, #cbd5e1, #94a3b8, #64748b, #475569, #334155, transparent)`
-  };
-
-  return (
-    <Tag
-      className={cn(
-        'relative flex items-center justify-center overflow-hidden p-[1px] group',
-        containerClassName
-      )}
-      {...props}
-    >
-      <div
-        className="absolute inset-0 opacity-75 blur-sm animate-spin"
-        style={{
-          ...gradientStyle,
-          animationDuration: `${duration * 3}s`,
-          animationDirection: clockwise ? 'normal' : 'reverse'
-        }}
-      />
-      <div
-        className={cn(
-          'relative z-10 px-8 py-3 font-medium backdrop-blur-3xl',
-          className
-        )}
-      >
-        {children}
-      </div>
-    </Tag>
-  );
-};
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -53,25 +9,44 @@ const LandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl sm:text-7xl font-bold text-center"
-      >
-        Animate Learning
-      </motion.h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold mb-4">
+          Sweet Shop Management System
+        </h1>
 
-      <motion.div className="mt-10">
-        <HoverBorderGradient
-          as="button"
-          containerClassName="rounded-full"
-          className="bg-white dark:bg-black text-black dark:text-white"
-          onClick={() => (user ? navigate('/dashboard') : setShowLogin(true))}
-        >
-          {user ? 'Welcome Back!' : 'Get Started'}
-        </HoverBorderGradient>
-      </motion.div>
+        <p className="text-gray-600 mb-6">
+          Manage sweets inventory, purchase items, and restock products.
+        </p>
+
+        {!user ? (
+          <>
+            <button
+              onClick={() => setShowLogin(true)}
+              className="w-full bg-blue-600 text-white py-2 rounded mb-3"
+            >
+              Login
+            </button>
+
+            <p className="text-sm text-gray-500">
+              Please login to continue
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mb-4 text-green-600">
+              Logged in as <strong>{user.email}</strong>
+            </p>
+
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full bg-green-600 text-white py-2 rounded"
+            >
+              Go to Dashboard
+            </button>
+          </>
+        )}
+      </div>
 
       {showLogin && <Login onClose={() => setShowLogin(false)} />}
     </div>
