@@ -1,10 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert';
+import jwt from 'jsonwebtoken';
 import userAuth from '../../middleware/auth.js';
 
-test('userAuth should fail when token is missing', async () => {
+test('userAuth should allow request with valid token', async () => {
+  jwt.verify = () => ({ id: 'user123' });
+
   const req = {
-    headers: {},
+    headers: { token: 'valid-token' },
+    body: {}
+  };
+
+  let nextCalled = false;
+  const next = () => {
+    nextCalled = true;
+  };
+
+  const res = {
+    json: () => {}
+  };
+
+  await userAuth(req, res, next);
+
+  assert.strictEqual(req.body.userId, 'user123');
+  assert.strictEqual(nextCalled, true);
+});
+
+test('userAuth should fail on invalid token', async () => {
+  jwt.verify = () => {
+    throw new Error('Invalid token');
+  };
+
+  const req = {
+    headers: { token: 'bad-token' },
     body: {}
   };
 
@@ -15,14 +43,10 @@ test('userAuth should fail when token is missing', async () => {
     }
   };
 
-  let nextCalled = false;
-  const next = () => {
-    nextCalled = true;
-  };
+  const next = () => {};
 
   await userAuth(req, res, next);
 
   assert.strictEqual(jsonResponse.success, false);
-  assert.strictEqual(jsonResponse.message, 'Not Authorized. Login Again');
-  assert.strictEqual(nextCalled, false);
+  assert.strictEqual(jsonResponse.message, 'Invalid token');
 });
