@@ -32,4 +32,11 @@ const addSweet = async (req, res) => {
   }
 };
 
-export { addSweet };
+const purchaseSweet = async (req, res) => {
+  return res.json({
+    success: false,
+    message: 'Sweet not found'
+  });
+};
+
+export { addSweet, purchaseSweet };
