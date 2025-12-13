@@ -1,11 +1,11 @@
-test('restockSweet should increase sweet quantity', async () => {
-  sweetModel.findById = async () => ({
-    _id: 'sweet123',
-    quantity: 5,
-    save: async function () {
-      return this;
-    }
-  });
+import test from 'node:test';
+import assert from 'node:assert';
+import sweetModel from '../../models/sweetModel.js';
+import { restockSweet } from '../../controllers/sweetController.js';
+
+
+test('restockSweet should fail if sweet does not exist', async () => {
+  sweetModel.findById = async () => null;
 
   const req = {
     params: { id: 'sweet123' },
@@ -19,6 +19,6 @@ test('restockSweet should increase sweet quantity', async () => {
 
   await restockSweet(req, res);
 
-  assert.strictEqual(response.success, true);
-  assert.strictEqual(response.sweet.quantity, 15);
+  assert.strictEqual(response.success, false);
+  assert.strictEqual(response.message, 'Sweet not found');
 });

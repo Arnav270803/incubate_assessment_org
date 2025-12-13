@@ -96,10 +96,32 @@ const searchSweets = async (req, res) => {
 
 
 const restockSweet = async (req, res) => {
-  return res.json({
-    success: false,
-    message: 'Sweet not found'
-  });
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    const sweet = await sweetModel.findById(id);
+
+    if (!sweet) {
+      return res.json({
+        success: false,
+        message: 'Sweet not found'
+      });
+    }
+
+    sweet.quantity += quantity;
+    await sweet.save();
+
+    return res.json({
+      success: true,
+      sweet
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message
+    });
+  }
 };
 
 
