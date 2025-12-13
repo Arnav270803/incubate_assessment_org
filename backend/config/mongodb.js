@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
     // this is just temporary , i'll connect the database after completing this project 
-    process.env.MONGODB_URI = 'mongodb://test-uri';
 
   if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI not defined');
