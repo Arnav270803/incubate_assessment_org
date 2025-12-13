@@ -1,4 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert';
 import sweetModel from '../../models/sweetModel.js';
+import { addSweet } from '../../controllers/sweetController.js';
+
 
 test('addSweet should succeed with valid input', async () => {
   // mock save
