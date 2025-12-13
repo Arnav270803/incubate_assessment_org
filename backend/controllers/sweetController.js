@@ -77,5 +77,22 @@ const getAllSweets = async (req, res) => {
   });
 };
 
+const searchSweets = async (req, res) => {
+  const { q } = req.query;
 
-export { addSweet, purchaseSweet, getAllSweets };
+  const sweets = await sweetModel.find({
+    $or: [
+      { name: { $regex: q, $options: 'i' } },
+      { category: { $regex: q, $options: 'i' } }
+    ]
+  });
+
+  return res.json({
+    success: true,
+    sweets
+  });
+};
+
+
+
+export { addSweet, purchaseSweet, getAllSweets, searchSweets };
