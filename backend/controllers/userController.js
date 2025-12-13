@@ -20,4 +20,15 @@ const loginUser = (User = userModel) => async (req, res) => {
   }
 };
 
-export { loginUser };
+
+const registerUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.json({ success: false, message: 'Missing Details' });
+  }
+};
+
+
+
+export { loginUser , registerUser};
