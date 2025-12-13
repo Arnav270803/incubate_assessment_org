@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Login = ({ onClose }) => {
-  const { login } = useAuth(); // login will be added via TDD later
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    // Stub for now — real logic comes next phase
-    console.log('Login submitted (stub)', { email, password });
+
+    try {
+      login(email, password);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -19,9 +25,13 @@ const Login = ({ onClose }) => {
         onSubmit={onSubmitHandler}
         className="bg-white rounded-xl p-8 w-full max-w-md"
       >
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          Login
-        </h2>
+        <h2 className="text-xl font-semibold mb-6 text-center">Login</h2>
+
+        {error && (
+          <p className="mb-4 text-red-500 text-sm text-center">
+            {error}
+          </p>
+        )}
 
         <input
           type="email"
@@ -29,7 +39,6 @@ const Login = ({ onClose }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full mb-4 px-4 py-2 border rounded"
-          required
         />
 
         <input
@@ -38,7 +47,6 @@ const Login = ({ onClose }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full mb-6 px-4 py-2 border rounded"
-          required
         />
 
         <button

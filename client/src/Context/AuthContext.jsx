@@ -7,12 +7,19 @@ export const AuthProvider = ({ children }) => {
 
   const login = (email, password) => {
     if (!email || !password) {
-      throw new Error('Invalid credentials');
+      throw new Error('Email and password required');
     }
-    setUser({ email, role: 'USER' });
+
+    // TEMP: mock user (backend wiring comes later)
+    setUser({
+      email,
+      role: 'USER'
+    });
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
@@ -21,4 +28,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
