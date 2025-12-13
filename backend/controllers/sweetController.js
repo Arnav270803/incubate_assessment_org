@@ -95,4 +95,14 @@ const searchSweets = async (req, res) => {
 
 
 
-export { addSweet, purchaseSweet, getAllSweets, searchSweets };
+const restockSweet = async (req, res) => {
+  return res.json({
+    success: false,
+    message: 'Sweet not found'
+  });
+};
+
+
+
+
+export { addSweet, purchaseSweet, getAllSweets, searchSweets, restockSweet };
