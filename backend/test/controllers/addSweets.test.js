@@ -1,10 +1,19 @@
-import test from 'node:test';
-import assert from 'node:assert';
-import { addSweet } from '../../controllers/sweetController.js';
+import sweetModel from '../../models/sweetModel.js';
 
-test('addSweet should fail when required fields are missing', async () => {
+test('addSweet should succeed with valid input', async () => {
+  // mock save
+  sweetModel.prototype.save = async function () {
+    this._id = 'sweet123';
+    return this;
+  };
+
   const req = {
-    body: {}
+    body: {
+      name: 'Ladoo',
+      category: 'Indian',
+      price: 10,
+      quantity: 50
+    }
   };
 
   let response;
@@ -16,6 +25,6 @@ test('addSweet should fail when required fields are missing', async () => {
 
   await addSweet(req, res);
 
-  assert.strictEqual(response.success, false);
-  assert.strictEqual(response.message, 'Missing sweet details');
+  assert.strictEqual(response.success, true);
+  assert.strictEqual(response.sweet.name, 'Ladoo');
 });
