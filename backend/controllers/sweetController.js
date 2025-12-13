@@ -68,4 +68,14 @@ const purchaseSweet = async (req, res) => {
   }
 };
 
-export { addSweet, purchaseSweet };
+
+const getAllSweets = async (req, res) => {
+  const sweets = await sweetModel.find();
+  return res.json({
+    success: true,
+    sweets
+  });
+};
+
+
+export { addSweet, purchaseSweet, getAllSweets };
