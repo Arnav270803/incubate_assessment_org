@@ -1,3 +1,6 @@
+
+
+
 import { useState, useEffect } from 'react';
 import { 
   LogOut, 
@@ -7,45 +10,28 @@ import {
   Package, 
   Candy,
   X,
-  TrendingUp
+  TrendingUp,
+  Edit, // New: For update
+  Trash // New: For delete
 } from 'lucide-react';
-
-// Mock Auth Context - for demo only
-const useAuth = () => ({
-  user: { name: 'Demo User' },
-  logout: () => console.log('Logged out'),
-  isAdmin: () => true
-});
-
-// Mock API - for demo only
-const sweetApi = {
-  getAllSweets: async () => ({
-    success: true,
-    sweets: []
-  }),
-  searchSweets: async (query) => ({
-    success: true,
-    sweets: []
-  }),
-  addSweet: async (sweet) => ({ success: true }),
-  purchaseSweet: async (id, qty) => ({ success: true }),
-  restockSweet: async (id, qty) => ({ success: true })
-};
-
-const toast = {
-  error: (msg) => console.error(msg),
-  success: (msg) => console.log(msg),
-  info: (msg) => console.info(msg)
-};
+import { useAuth } from '../context/AuthContext'; // New: Real useAuth
+import { sweetApi } from '../utils/sweetApi'; // New: Real sweetApi
+import { toast } from 'react-toastify'; // New: Real toast
+import { useNavigate } from 'react-router-dom'; // New: For logout redirect if needed
 
 const Dashboard = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin } = useAuth(); // Replaced mock
+  const navigate = useNavigate(); // New: Optional for redirect after logout
   const [sweets, setSweets] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [minPrice, setMinPrice] = useState(''); // New: For price range
+  const [maxPrice, setMaxPrice] = useState(''); // New: For price range
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showRestockModal, setShowRestockModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false); // New: Update modal
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // New: Delete confirm
   const [selectedSweet, setSelectedSweet] = useState(null);
 
   // Form states
@@ -57,6 +43,12 @@ const Dashboard = () => {
   });
   const [purchaseQuantity, setPurchaseQuantity] = useState(1);
   const [restockQuantity, setRestockQuantity] = useState(1);
+  const [updateSweetData, setUpdateSweetData] = useState({ // New: For update form
+    name: '',
+    category: '',
+    price: '',
+    quantity: ''
+  });
 
   // Fetch sweets on mount
   useEffect(() => {
@@ -66,31 +58,26 @@ const Dashboard = () => {
   const fetchSweets = async () => {
     try {
       setLoading(true);
-      const response = await sweetApi.getAllSweets();
+      const response = await sweetApi.getAllSweets(); // Replaced mock
       if (response.success) {
         setSweets(response.sweets);
       }
     } catch (error) {
-      toast.error('Failed to fetch sweets');
+      toast.error(error.message || 'Failed to fetch sweets'); // Real toast
     } finally {
       setLoading(false);
     }
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      fetchSweets();
-      return;
-    }
-
     try {
       setLoading(true);
-      const response = await sweetApi.searchSweets(searchQuery);
+      const response = await sweetApi.searchSweets(searchQuery, minPrice, maxPrice); // Updated with price range
       if (response.success) {
         setSweets(response.sweets);
       }
     } catch (error) {
-      toast.error('Search failed');
+      toast.error(error.message || 'Search failed');
     } finally {
       setLoading(false);
     }
@@ -117,8 +104,6 @@ const Dashboard = () => {
         setShowAddModal(false);
         setNewSweet({ name: '', category: '', price: '', quantity: '' });
         fetchSweets();
-      } else {
-        toast.error(response.message);
       }
     } catch (error) {
       toast.error(error.message || 'Failed to add sweet');
@@ -142,8 +127,6 @@ const Dashboard = () => {
         setPurchaseQuantity(1);
         setSelectedSweet(null);
         fetchSweets();
-      } else {
-        toast.error(response.message);
       }
     } catch (error) {
       toast.error(error.message || 'Purchase failed');
@@ -167,17 +150,78 @@ const Dashboard = () => {
         setRestockQuantity(1);
         setSelectedSweet(null);
         fetchSweets();
-      } else {
-        toast.error(response.message);
       }
     } catch (error) {
       toast.error(error.message || 'Restock failed');
     }
   };
 
+  // New: Handle update sweet
+  const handleUpdateSweet = async (e) => {
+    e.preventDefault();
+
+    if (!updateSweetData.name || !updateSweetData.category || !updateSweetData.price || updateSweetData.quantity === undefined) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    try {
+      const response = await sweetApi.updateSweet(selectedSweet._id, {
+        name: updateSweetData.name,
+        category: updateSweetData.category,
+        price: Number(updateSweetData.price),
+        quantity: Number(updateSweetData.quantity)
+      });
+
+      if (response.success) {
+        toast.success('Sweet updated successfully!');
+        setShowUpdateModal(false);
+        setSelectedSweet(null);
+        fetchSweets();
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to update sweet');
+    }
+  };
+
+  // New: Handle delete sweet
+  const handleDeleteSweet = async () => {
+    try {
+      const response = await sweetApi.deleteSweet(selectedSweet._id);
+
+      if (response.success) {
+        toast.success('Sweet deleted successfully!');
+        setShowDeleteConfirm(false);
+        setSelectedSweet(null);
+        fetchSweets();
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete sweet');
+    }
+  };
+
   const handleLogout = () => {
     logout();
     toast.info('Logged out successfully');
+    navigate('/'); // New: Redirect to landing after logout
+  };
+
+  // New: Open update modal with pre-filled data
+  const openUpdateModal = (sweet) => {
+    setSelectedSweet(sweet);
+    setUpdateSweetData({
+      name: sweet.name,
+      category: sweet.category,
+      price: sweet.price,
+      quantity: sweet.quantity
+    });
+    setShowUpdateModal(true);
+  };
+
+  // New: Open delete confirm
+  const openDeleteConfirm = (sweet) => {
+    setSelectedSweet(sweet);
+    setShowDeleteConfirm(true);
   };
 
   return (
@@ -192,7 +236,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Sweet Shop</h1>
-                <p className="text-sm text-gray-500">{user?.name}</p>
+                <p className="text-sm text-gray-500">{user?.email}</p> {/* Changed to email */}
               </div>
             </div>
 
@@ -216,6 +260,21 @@ const Dashboard = () => {
         </div>
       </header>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Search and Actions */}
@@ -232,16 +291,33 @@ const Dashboard = () => {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
               />
             </div>
+            {/* New: Price range inputs */}
+            <input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="Min Price"
+              className="w-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
+            />
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Max Price"
+              className="w-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
+            />
             <button
               onClick={handleSearch}
               className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition shadow-md hover:shadow-lg"
             >
               Search
             </button>
-            {searchQuery && (
+            {(searchQuery || minPrice || maxPrice) && (
               <button
                 onClick={() => {
                   setSearchQuery('');
+                  setMinPrice('');
+                  setMaxPrice('');
                   fetchSweets();
                 }}
                 className="px-4 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition border border-gray-300 shadow-sm"
@@ -375,16 +451,30 @@ const Dashboard = () => {
                     )}
                     
                     {isAdmin() && (
-                      <button
-                        onClick={() => {
-                          setSelectedSweet(sweet);
-                          setShowRestockModal(true);
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold shadow-md hover:shadow-lg"
-                      >
-                        <Package className="w-4 h-4" />
-                        Restock
-                      </button>
+                      <>
+                        <button
+                          onClick={() => {
+                            setSelectedSweet(sweet);
+                            setShowRestockModal(true);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold shadow-md hover:shadow-lg"
+                        >
+                          <Package className="w-4 h-4" />
+                          Restock
+                        </button>
+                        <button
+                          onClick={() => openUpdateModal(sweet)}
+                          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm shadow-md hover:shadow-lg"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => openDeleteConfirm(sweet)}
+                          className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm shadow-md hover:shadow-lg"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -408,7 +498,7 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleAddSweet} className="space-y-4"> {/* Wrapped in form */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Name
@@ -473,13 +563,13 @@ const Dashboard = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleAddSweet}
+                  type="submit"
                   className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Add Sweet
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
@@ -519,7 +609,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handlePurchase} className="space-y-4"> {/* Wrapped in form */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Quantity
@@ -554,13 +644,13 @@ const Dashboard = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handlePurchase}
+                  type="submit"
                   className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Purchase
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
@@ -597,7 +687,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleRestock} className="space-y-4"> {/* Wrapped in form */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Restock Quantity
@@ -631,12 +721,154 @@ const Dashboard = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleRestock}
+                  type="submit"
                   className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Restock
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* New: Update Sweet Modal */}
+      {showUpdateModal && selectedSweet && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Update Sweet</h2>
+              <button
+                onClick={() => {
+                  setShowUpdateModal(false);
+                  setSelectedSweet(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateSweet} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={updateSweetData.name}
+                  onChange={(e) => setUpdateSweetData({ ...updateSweetData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+                  placeholder="e.g., Gulab Jamun"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={updateSweetData.category}
+                  onChange={(e) => setUpdateSweetData({ ...updateSweetData, category: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+                  placeholder="e.g., Indian Sweets"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Price (₹)
+                </label>
+                <input
+                  type="number"
+                  value={updateSweetData.price}
+                  onChange={(e) => setUpdateSweetData({ ...updateSweetData, price: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+                  placeholder="e.g., 50"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  value={updateSweetData.quantity}
+                  onChange={(e) => setUpdateSweetData({ ...updateSweetData, quantity: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+                  placeholder="e.g., 100"
+                  min="0"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUpdateModal(false);
+                    setSelectedSweet(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold shadow-md hover:shadow-lg"
+                >
+                  Update Sweet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* New: Delete Confirm Modal */}
+      {showDeleteConfirm && selectedSweet && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Delete Sweet</h2>
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setSelectedSweet(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="mb-6 text-center">
+              <p className="text-lg text-gray-700">
+                Are you sure you want to delete <span className="font-bold text-gray-900">{selectedSweet.name}</span>?
+              </p>
+              <p className="text-sm text-gray-500 mt-2">This action cannot be undone.</p>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setSelectedSweet(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteSweet}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold shadow-md hover:shadow-lg"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

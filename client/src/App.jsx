@@ -25,10 +25,9 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            // <ProtectedRoute>
-            //   <Dashboard />
-            // </ProtectedRoute>
-            <Dashboard />
+            <ProtectedRoute> {/* Uncommented */}
+              <Dashboard />
+            </ProtectedRoute>
           }
         />
       </Routes>

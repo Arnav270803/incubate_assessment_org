@@ -9,45 +9,33 @@ import jwt from 'jsonwebtoken';
 /**
  * LOGIN (factory preserved)
  */
+// 
+
+
+
+
 const loginUser = (User = userModel) => async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.json({
         success: false,
         message: 'User does not exist'
       });
     }
-
+    console.log('Before bcrypt.compare');  // Add this
     const isMatch = await bcrypt.compare(password, user.password);
-
+    console.log('After bcrypt.compare', isMatch);  // Add this
     if (!isMatch) {
       return res.json({
         success: false,
         message: 'Invalid credentials'
       });
     }
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role      
-      },
-      process.env.JWT_SECRET
-    );
-
-    return res.json({
-      success: true,
-      token,
-      user: {
-        name: user.email,
-        role: user.role
-      }
-    });
+    // ... rest of code
   } catch (error) {
+    console.log('Login error:', error);  // Add this for catch block
     return res.json({
       success: false,
       message: error.message
@@ -55,44 +43,39 @@ const loginUser = (User = userModel) => async (req, res) => {
   }
 };
 
-
-
-
 const registerUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.json({
         success: false,
         message: "Missing Details"
       });
     }
+    // Check if this is the first user
+    const existingUsers = await userModel.countDocuments();
+    const role = existingUsers === 0 ? 'ADMIN' : 'USER'; // New: First user is ADMIN
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
     const newUser = new userModel({
       email,
       password: hashedPassword,
-      role: 'USER'          
+      role
     });
-
     const user = await newUser.save();
-
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role      
+        role: user.role
       },
       process.env.JWT_SECRET
     );
-
     return res.json({
       success: true,
       token,
       user: {
-        name: user.email,
+        email: user.email, // Changed to email
         role: user.role
       }
     });
@@ -105,4 +88,21 @@ const registerUser = async (req, res) => {
 };
 
 export { loginUser, registerUser };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

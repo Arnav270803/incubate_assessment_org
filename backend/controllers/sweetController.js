@@ -128,3 +128,21 @@ const restockSweet = async (req, res) => {
 
 
 export { addSweet, purchaseSweet, getAllSweets, searchSweets, restockSweet };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

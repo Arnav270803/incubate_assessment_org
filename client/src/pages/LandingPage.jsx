@@ -1,4 +1,12 @@
+
+
+
+
+
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext'; // New: Import real useAuth
+import { useNavigate } from 'react-router-dom'; // New: For redirection
+import { toast } from 'react-toastify'; // New: Use toast instead of alert
 import { Candy, ShoppingBag, TrendingUp, Shield, Mail, Lock, UserPlus, LogIn } from 'lucide-react';
 
 const LandingPage = () => {
@@ -7,19 +15,32 @@ const LandingPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const { login, register } = useAuth(); // New: Use real auth functions
+  const navigate = useNavigate(); // New: For redirect
+
+  const handleSubmit = async (e) => { // Changed to async (e) for form
+    e.preventDefault(); // New: Prevent default form submit
+
     if (!email || !password) {
-      alert('Please fill all fields');
+      toast.error('Please fill all fields'); // Changed to toast
       return;
     }
 
     setLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert(isLogin ? 'Login successful!' : 'Registration successful!');
+      const result = isLogin 
+        ? await login(email, password)
+        : await register(email, password);
+
+      if (result.success) {
+        toast.success(isLogin ? 'Login successful!' : 'Registration successful!');
+        navigate('/dashboard'); // New: Redirect to dashboard
+      } else {
+        toast.error(result.message || 'Operation failed');
+      }
     } catch (error) {
-      alert('Something went wrong');
+      toast.error('Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -51,8 +72,8 @@ const LandingPage = () => {
               </p>
             </div>
 
-            {/* Form */}
-            <div className="space-y-5">
+            {/* Form */} 
+            <form onSubmit={handleSubmit} className="space-y-5"> {/* New: Wrap in form for submit */}
               {/* Email Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -89,14 +110,13 @@ const LandingPage = () => {
                     className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-200 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     placeholder="••••••••"
                     disabled={loading}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                   />
                 </div>
               </div>
 
               {/* Submit Button */}
               <button
-                onClick={handleSubmit}
+                type="submit" // New: type=submit for form
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-gray-800 to-black text-white py-3.5 rounded-xl font-semibold hover:from-gray-900 hover:to-gray-800 shadow-lg shadow-gray-900/30 hover:shadow-xl hover:shadow-gray-900/50 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
               >
@@ -109,7 +129,7 @@ const LandingPage = () => {
                   </>
                 )}
               </button>
-            </div>
+            </form>
 
             {/* Toggle Login/Register */}
             <div className="mt-6 text-center">
@@ -187,3 +207,19 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
