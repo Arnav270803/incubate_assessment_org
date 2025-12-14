@@ -182,12 +182,12 @@ Ensure your development environment has:
 ### 🎨 Frontend Setup
 
 1. **Navigate to Frontend Directory**
-   ```bash
+   ```
    cd ../client
    ```
 
 2. **Install Dependencies**
-   ```bash
+   ```
    npm install
    ```
 
@@ -199,7 +199,7 @@ Ensure your development environment has:
    ```
 
 4. **Start Development Server**
-   ```bash
+   ```
    npm run dev
    ```
 
@@ -513,12 +513,10 @@ Coverage:    82.5%
 
 **Backend (.env):**
 ```env
-NODE_ENV=production
+
 PORT=5000
 MONGODB_URI=<your_mongodb_atlas_uri>
 JWT_SECRET=<your_production_secret>
-JWT_EXPIRE=7d
-ALLOWED_ORIGINS=https://your-frontend-domain.com
 ```
 
 **Frontend (.env.production):**
@@ -538,9 +536,8 @@ Throughout the development lifecycle, AI tools were leveraged strategically to e
 
 | Tool | Primary Use Cases | Impact |
 |------|------------------|--------|
-| **Grok (xAI)** | Architecture decisions, debugging complex issues, API design | High |
-| **GitHub Copilot** | Boilerplate generation, test case creation, code completion | Medium |
-| **ChatGPT** | UI/UX brainstorming, documentation writing, algorithm optimization | Medium |
+| **Grok (xAI)** | Architecture decisions, debugging complex issues, API design | Small |
+| **ChatGPT/Claude** | UI/UX brainstorming, documentation writing, algorithm optimization | Medium |
 
 ### 📋 Detailed AI Contribution Log
 
@@ -565,26 +562,22 @@ Throughout the development lifecycle, AI tools were leveraged strategically to e
 - **Task**: Mongoose schema optimization
 - **Contribution**: Recommended indexes for search performance and schema validation
 - **Manual Refinement**: Added custom validators, virtual fields, and pre-save hooks
-- **Impact**: Optimized query performance by 40%
 
 #### Frontend Development
 
 **4. Component Architecture**
-- **AI Tool**: GitHub Copilot
 - **Task**: React component boilerplate
 - **Contribution**: Generated initial structure for Dashboard, Modal, and Auth components
 - **Manual Refinement**: Implemented custom hooks, state management, and error boundaries
 - **Code Ownership**: 100% understanding and ability to maintain/extend
 
 **5. State Management**
-- **AI Tool**: Grok
 - **Task**: Context API implementation for authentication
 - **Contribution**: Provided `AuthContext.jsx` structure with provider pattern
 - **Manual Refinement**: Added token persistence, automatic logout, and role management
 - **Enhancement**: Integrated toast notifications and loading states
 
 **6. UI/UX Design**
-- **AI Tool**: ChatGPT
 - **Task**: Tailwind CSS styling and responsive design
 - **Contribution**: Suggested utility class combinations for modals and cards
 - **Manual Refinement**: Created custom color scheme, animations, and mobile breakpoints
@@ -593,78 +586,19 @@ Throughout the development lifecycle, AI tools were leveraged strategically to e
 #### Testing & Quality Assurance
 
 **7. Test Suite Development**
-- **AI Tool**: GitHub Copilot
 - **Task**: Jest and Vitest test case generation
 - **Contribution**: Created test skeletons for controllers and middleware
 - **Manual Refinement**: Added edge cases, integration tests, and mock data
 - **Coverage Achievement**: Increased from 45% to 82% through systematic testing
 
-**8. Debugging Complex Issues**
-- **AI Tool**: Grok
-- **Example Issue**: "Frontend can't connect to backend - CORS errors"
-- **Resolution Process**:
-  1. Grok analyzed error logs and suggested CORS configuration
-  2. Identified missing `credentials: true` in Axios config
-  3. Manually verified across all API calls and tested edge cases
-- **Time Saved**: ~3 hours of debugging
 
-**9. Feature Implementation: Price Range Filter**
-- **AI Tool**: Grok
+**8. Feature Implementation: Price Range Filter**
 - **Task**: Extend search functionality
 - **Contribution**: Generated MongoDB aggregation pipeline for price filtering
 - **Manual Refinement**: Optimized query, added frontend validation, error handling
-- **Result**: Efficient search with <100ms response time
-
-### 🎯 AI Impact Metrics
-
-**Productivity Gains:**
-- **Overall Development Speed**: +40% faster completion
-- **Debugging Time Reduction**: From hours to minutes (avg. 60% reduction)
-- **Test Coverage Increase**: 45% → 82% with AI-generated test skeletons
-- **Documentation Quality**: Comprehensive README and code comments
-
-**Quality Maintained:**
-- **Code Review Pass Rate**: 100% (all AI code manually reviewed)
-- **Test Success Rate**: 100% (25/25 tests passing)
-- **Bug Count**: Minimal (2 minor bugs caught in testing)
-- **Performance**: Meeting all optimization goals
-
-### 💡 Reflection on AI-Assisted Development
-
-**Advantages:**
-1. **Rapid Prototyping**: AI accelerated initial feature implementation
-2. **Learning Catalyst**: Exposed to best practices and modern patterns
-3. **Debugging Efficiency**: Faster identification of issues and solutions
-4. **Documentation**: Helped structure clear, comprehensive documentation
-
-**Challenges & Mitigations:**
-1. **Over-Reliance Risk**: Mitigated by always reviewing and testing AI code
-2. **Generic Solutions**: Customized all AI suggestions to project requirements
-3. **Understanding Gap**: Researched every AI-provided solution to ensure full comprehension
-
-**Best Practices Followed:**
-- ✅ Never blindly accepted AI-generated code
-- ✅ Always tested AI suggestions thoroughly
-- ✅ Maintained full understanding of every line of code
-- ✅ Used AI as a collaborative tool, not a replacement for thinking
-- ✅ Documented AI contributions transparently (this section)
-
-**Professional Takeaway:**
-AI tools are powerful amplifiers of human capability when used responsibly. This project demonstrates that combining AI efficiency with human oversight, creativity, and critical thinking produces superior results while accelerating the development lifecycle. The key is maintaining ownership of the codebase through thorough understanding and rigorous testing.
 
 ---
 
-## 📊 Project Metrics
-
-- **Total Lines of Code**: ~5,000
-- **Components**: 15+ React components
-- **API Endpoints**: 12 RESTful endpoints
-- **Test Cases**: 25+ comprehensive tests
-- **Code Coverage**: 82%+
-- **Development Time**: 40 hours (with AI assistance)
-- **Bug Count**: 0 critical, 2 minor (resolved)
-
----
 
 ## 🔒 Security Features
 
@@ -762,48 +696,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for full details.
-
-```
-MIT License
-
-Copyright (c) 2024 [Your Name]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software...
-```
-
----
-
-## 👨‍💻 About the Developer
-
-**[Your Name]**
-
-Full-Stack Developer passionate about building scalable, user-centric applications with modern technologies. This project demonstrates proficiency in:
-
-- ✅ Full-Stack JavaScript Development (MERN Stack)
-- ✅ Test-Driven Development (TDD)
-- ✅ RESTful API Design & Implementation
-- ✅ Authentication & Security Best Practices
-- ✅ Responsive UI/UX Design
-- ✅ Database Design & Optimization
-- ✅ Git Version Control & Collaboration
-- ✅ Professional Documentation
-
-### 🔗 Connect With Me
-
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/yourprofile)
-- **Portfolio**: [yourportfolio.com](https://yourportfolio.com)
-- **Email**: your.email@example.com
-
----
-
 ## 🙏 Acknowledgments
 
 - **MongoDB** for the excellent database platform
@@ -812,16 +704,6 @@ Full-Stack Developer passionate about building scalable, user-centric applicatio
 - **Anthropic (Claude)** for AI assistance during development
 - **Open Source Community** for incredible tools and libraries
 
----
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. **Check the [Issues](https://github.com/yourusername/sweet-shop-management/issues)** page
-2. **Create a new issue** with detailed information
-3. **Email**: support@yourproject.com
-4. **Documentation**: See inline code comments and this README
 
 ---
 
@@ -830,8 +712,6 @@ If you encounter any issues or have questions:
 ### ⭐ Star this repository if you find it helpful!
 
 **Made with ❤️, ☕, and Test-Driven Development**
-
-![Visitors](https://visitor-badge.laobi.icu/badge?page_id=yourusername.sweet-shop-management)
 
 ---
 
