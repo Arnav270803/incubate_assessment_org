@@ -1,7 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { sweetApi } from '../utils/sweetApi';
-import { toast } from 'react-toastify';
 import { 
   LogOut, 
   Plus, 
@@ -12,6 +9,34 @@ import {
   X,
   TrendingUp
 } from 'lucide-react';
+
+// Mock Auth Context - for demo only
+const useAuth = () => ({
+  user: { name: 'Demo User' },
+  logout: () => console.log('Logged out'),
+  isAdmin: () => true
+});
+
+// Mock API - for demo only
+const sweetApi = {
+  getAllSweets: async () => ({
+    success: true,
+    sweets: []
+  }),
+  searchSweets: async (query) => ({
+    success: true,
+    sweets: []
+  }),
+  addSweet: async (sweet) => ({ success: true }),
+  purchaseSweet: async (id, qty) => ({ success: true }),
+  restockSweet: async (id, qty) => ({ success: true })
+};
+
+const toast = {
+  error: (msg) => console.error(msg),
+  success: (msg) => console.log(msg),
+  info: (msg) => console.info(msg)
+};
 
 const Dashboard = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -158,30 +183,30 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center shadow-md">
                 <Candy className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Sweet Shop</h1>
-                <p className="text-sm text-gray-600">{user?.name}</p>
+                <h1 className="text-2xl font-bold text-gray-900">Sweet Shop</h1>
+                <p className="text-sm text-gray-500">{user?.name}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
                 isAdmin() 
-                  ? 'bg-purple-100 text-purple-700' 
-                  : 'bg-blue-100 text-blue-700'
+                  ? 'bg-gray-900 text-white border-gray-900' 
+                  : 'bg-white text-gray-700 border-gray-300'
               }`}>
                 {isAdmin() ? '👑 Admin' : '👤 User'}
               </span>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition border border-gray-300"
               >
                 <LogOut className="w-5 h-5" />
                 Logout
@@ -204,12 +229,12 @@ const Dashboard = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Search by name or category..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
               />
             </div>
             <button
               onClick={handleSearch}
-              className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+              className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition shadow-md hover:shadow-lg"
             >
               Search
             </button>
@@ -219,7 +244,7 @@ const Dashboard = () => {
                   setSearchQuery('');
                   fetchSweets();
                 }}
-                className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="px-4 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition border border-gray-300 shadow-sm"
               >
                 Clear
               </button>
@@ -229,7 +254,7 @@ const Dashboard = () => {
           {isAdmin() && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition"
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition shadow-md hover:shadow-lg font-medium"
             >
               <Plus className="w-5 h-5" />
               Add Sweet
@@ -239,42 +264,42 @@ const Dashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Total Sweets</p>
-                <p className="text-3xl font-bold text-gray-800">{sweets.length}</p>
+                <p className="text-gray-500 text-sm font-medium">Total Sweets</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{sweets.length}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Candy className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center shadow-md">
+                <Candy className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">In Stock</p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-gray-500 text-sm font-medium">In Stock</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">
                   {sweets.filter(s => s.quantity > 0).length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Package className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+                <Package className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Out of Stock</p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-gray-500 text-sm font-medium">Out of Stock</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">
                   {sweets.filter(s => s.quantity === 0).length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center shadow-md">
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
@@ -283,7 +308,7 @@ const Dashboard = () => {
         {/* Sweets Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
           </div>
         ) : sweets.length === 0 ? (
           <div className="text-center py-16">
@@ -292,7 +317,7 @@ const Dashboard = () => {
             {isAdmin() && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="mt-4 text-purple-600 hover:text-purple-700 font-medium"
+                className="mt-4 text-emerald-600 hover:text-emerald-700 font-semibold"
               >
                 Add your first sweet
               </button>
@@ -303,32 +328,32 @@ const Dashboard = () => {
             {sweets.map((sweet) => (
               <div
                 key={sweet._id}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden border border-gray-200"
               >
-                <div className="h-40 bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center">
+                <div className="h-40 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                   <Candy className="w-16 h-16 text-white" />
                 </div>
                 
                 <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 truncate">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">
                     {sweet.name}
                   </h3>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Category:</span>
-                      <span className="font-medium text-gray-800">{sweet.category}</span>
+                      <span className="text-gray-500 font-medium">Category:</span>
+                      <span className="font-semibold text-gray-900">{sweet.category}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Price:</span>
-                      <span className="font-bold text-purple-600">₹{sweet.price}</span>
+                      <span className="text-gray-500 font-medium">Price:</span>
+                      <span className="font-bold text-gray-900">₹{sweet.price}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Stock:</span>
-                      <span className={`font-medium ${
+                      <span className="text-gray-500 font-medium">Stock:</span>
+                      <span className={`font-semibold ${
                         sweet.quantity === 0 ? 'text-red-600' : 
                         sweet.quantity < 10 ? 'text-orange-600' : 
-                        'text-green-600'
+                        'text-emerald-600'
                       }`}>
                         {sweet.quantity} units
                       </span>
@@ -342,7 +367,7 @@ const Dashboard = () => {
                           setSelectedSweet(sweet);
                           setShowPurchaseModal(true);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-semibold shadow-md hover:shadow-lg"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Buy
@@ -355,7 +380,7 @@ const Dashboard = () => {
                           setSelectedSweet(sweet);
                           setShowRestockModal(true);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold shadow-md hover:shadow-lg"
                       >
                         <Package className="w-4 h-4" />
                         Restock
@@ -371,54 +396,54 @@ const Dashboard = () => {
 
       {/* Add Sweet Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Add New Sweet</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Add New Sweet</h2>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <form onSubmit={handleAddSweet} className="space-y-4">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Name
                 </label>
                 <input
                   type="text"
                   value={newSweet.name}
                   onChange={(e) => setNewSweet({ ...newSweet, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
                   placeholder="e.g., Gulab Jamun"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Category
                 </label>
                 <input
                   type="text"
                   value={newSweet.category}
                   onChange={(e) => setNewSweet({ ...newSweet, category: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
                   placeholder="e.g., Indian Sweets"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Price (₹)
                 </label>
                 <input
                   type="number"
                   value={newSweet.price}
                   onChange={(e) => setNewSweet({ ...newSweet, price: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
                   placeholder="e.g., 50"
                   min="0"
                   step="0.01"
@@ -426,14 +451,14 @@ const Dashboard = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Quantity
                 </label>
                 <input
                   type="number"
                   value={newSweet.quantity}
                   onChange={(e) => setNewSweet({ ...newSweet, quantity: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
                   placeholder="e.g., 100"
                   min="0"
                 />
@@ -443,75 +468,75 @@ const Dashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                  onClick={handleAddSweet}
+                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Add Sweet
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Purchase Modal */}
       {showPurchaseModal && selectedSweet && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Purchase Sweet</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Purchase Sweet</h2>
               <button
                 onClick={() => {
                   setShowPurchaseModal(false);
                   setSelectedSweet(null);
                   setPurchaseQuantity(1);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {selectedSweet.name}
               </h3>
               <div className="space-y-2 text-sm">
                 <p className="text-gray-600">
-                  Category: <span className="font-medium text-gray-800">{selectedSweet.category}</span>
+                  Category: <span className="font-semibold text-gray-900">{selectedSweet.category}</span>
                 </p>
                 <p className="text-gray-600">
-                  Price: <span className="font-bold text-purple-600">₹{selectedSweet.price}</span>
+                  Price: <span className="font-bold text-gray-900">₹{selectedSweet.price}</span>
                 </p>
                 <p className="text-gray-600">
-                  Available: <span className="font-medium text-green-600">{selectedSweet.quantity} units</span>
+                  Available: <span className="font-semibold text-emerald-600">{selectedSweet.quantity} units</span>
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handlePurchase} className="space-y-4">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Quantity
                 </label>
                 <input
                   type="number"
                   value={purchaseQuantity}
                   onChange={(e) => setPurchaseQuantity(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-sm"
                   min="1"
                   max={selectedSweet.quantity}
                 />
               </div>
 
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                <p className="text-2xl font-bold text-purple-600">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+                <p className="text-sm text-gray-600 mb-1 font-medium">Total Amount</p>
+                <p className="text-2xl font-bold text-gray-900">
                   ₹{(selectedSweet.price * purchaseQuantity).toFixed(2)}
                 </p>
               </div>
@@ -524,71 +549,71 @@ const Dashboard = () => {
                     setSelectedSweet(null);
                     setPurchaseQuantity(1);
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                  onClick={handlePurchase}
+                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Purchase
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Restock Modal */}
       {showRestockModal && selectedSweet && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Restock Sweet</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Restock Sweet</h2>
               <button
                 onClick={() => {
                   setShowRestockModal(false);
                   setSelectedSweet(null);
                   setRestockQuantity(1);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {selectedSweet.name}
               </h3>
               <div className="space-y-2 text-sm">
                 <p className="text-gray-600">
-                  Category: <span className="font-medium text-gray-800">{selectedSweet.category}</span>
+                  Category: <span className="font-semibold text-gray-900">{selectedSweet.category}</span>
                 </p>
                 <p className="text-gray-600">
-                  Current Stock: <span className="font-medium text-orange-600">{selectedSweet.quantity} units</span>
+                  Current Stock: <span className="font-semibold text-orange-600">{selectedSweet.quantity} units</span>
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleRestock} className="space-y-4">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Restock Quantity
                 </label>
                 <input
                   type="number"
                   value={restockQuantity}
                   onChange={(e) => setRestockQuantity(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 shadow-sm"
                   min="1"
                 />
               </div>
 
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">New Stock Level</p>
-                <p className="text-2xl font-bold text-green-600">
+              <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-sm">
+                <p className="text-sm text-gray-600 mb-1 font-medium">New Stock Level</p>
+                <p className="text-2xl font-bold text-emerald-700">
                   {selectedSweet.quantity + restockQuantity} units
                 </p>
               </div>
@@ -601,18 +626,18 @@ const Dashboard = () => {
                     setSelectedSweet(null);
                     setRestockQuantity(1);
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                  onClick={handleRestock}
+                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold shadow-md hover:shadow-lg"
                 >
                   Restock
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
