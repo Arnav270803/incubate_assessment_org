@@ -40,16 +40,12 @@ const purchaseSweet = async (req, res) => {
     const sweet = await sweetModel.findById(id);
 
     if (!sweet) {
-      return res.json({
-        success: false,
-        message: 'Sweet not found'
+      return res.json({ success: false, message: 'Sweet not found'
       });
     }
 
     if (sweet.quantity < quantity) {
-      return res.json({
-        success: false,
-        message: 'Insufficient stock'
+      return res.json({ success: false, message: 'Insufficient stock'
       });
     }
 

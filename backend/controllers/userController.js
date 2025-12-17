@@ -1,47 +1,7 @@
-
-
-
-
 import userModel from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-/**
- * LOGIN (factory preserved)
- */
-// 
-
-
-
-
-const loginUser = (User = userModel) => async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.json({
-        success: false,
-        message: 'User does not exist'
-      });
-    }
-    console.log('Before bcrypt.compare');  // Add this
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log('After bcrypt.compare', isMatch);  // Add this
-    if (!isMatch) {
-      return res.json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-    // ... rest of code
-  } catch (error) {
-    console.log('Login error:', error);  // Add this for catch block
-    return res.json({
-      success: false,
-      message: error.message
-    });
-  }
-};
 
 const registerUser = async (req, res) => {
   try {
@@ -83,6 +43,56 @@ const registerUser = async (req, res) => {
     return res.json({
       success: false,
       message: error.message
+    });
+  }
+};
+
+
+const loginUser = async (req, res) => {
+  // Removed the confusing and unnecessary "(User = userModel)" syntax
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.json({
+        success: false,
+        message: "Missing email or password"
+      });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({
+        success: false,
+        message: 'User does not exist'
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    //  Forgot to add this token checking logic . :(
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+    );
+
+    return res.json({
+      success: true,
+      token,
+      user: { email: user.email, role: user.role }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.json({
+      success: false,
+      message: error.message || 'Server error'
     });
   }
 };
