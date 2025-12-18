@@ -1,8 +1,4 @@
 
-
-
-
-
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext'; // New: Import real useAuth
 import { useNavigate } from 'react-router-dom'; // New: For redirection

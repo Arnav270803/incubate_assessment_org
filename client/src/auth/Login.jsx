@@ -1,7 +1,3 @@
-
-
-
-
 import { useState } from 'react';
 import { Candy, Mail, Lock, UserPlus, LogIn } from 'lucide-react';
 
@@ -19,11 +15,10 @@ const Login = () => {
 
     setLoading(true);
 
-    try {
-      // Simulated API call
+    try {// Simulated API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       alert(isLogin ? 'Login successful!' : 'Registration successful!');
-    } catch (error) {
+    } catch (error){
       alert('Something went wrong');
     } finally {
       setLoading(false);

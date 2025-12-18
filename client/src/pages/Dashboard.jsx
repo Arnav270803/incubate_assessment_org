@@ -1,19 +1,5 @@
-
-
-
 import { useState, useEffect } from 'react';
-import { 
-  LogOut, 
-  Plus, 
-  Search, 
-  ShoppingCart, 
-  Package, 
-  Candy,
-  X,
-  TrendingUp,
-  Edit, // New: For update
-  Trash // New: For delete
-} from 'lucide-react';
+import { LogOut, Plus, Search, ShoppingCart, Package, Candy,X,TrendingUp,Edit, Trash } from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; // New: Real useAuth
 import { sweetApi } from '../utils/sweetApi'; // New: Real sweetApi
 import { toast } from 'react-toastify'; // New: Real toast

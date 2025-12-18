@@ -1,9 +1,7 @@
-
-
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false }) => {// children is the content that you wanted to protect here 
   const { user, loading } = useAuth();
 
   if (loading) {
