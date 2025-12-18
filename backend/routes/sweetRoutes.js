@@ -9,7 +9,8 @@ sweetRouter.get('/', getAllSweets);
 sweetRouter.get('/search', searchSweets);
 // protected
 sweetRouter.post('/', userAuth, adminAuth, addSweet);
-sweetRouter.post('/:id/buy', userAuth, purchaseSweet);
+// sweetRouter.post('/:id/buy', userAuth, purchaseSweet);
+sweetRouter.post('/:id/purchase', userAuth, purchaseSweet);
 sweetRouter.post('/:id/restock', userAuth, adminAuth, restockSweet);
 
 export default sweetRouter;
